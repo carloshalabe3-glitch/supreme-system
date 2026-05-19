@@ -14,7 +14,7 @@ import {
   Cell,
   Legend,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Wallet, RefreshCw, Plus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, RefreshCw, Plus, PiggyBank } from 'lucide-react';
 import { getTransactions, getSubscriptions, getSavingsGoals } from '@/lib/storage';
 import {
   getTotalIncome,
@@ -47,7 +47,8 @@ export default function Dashboard() {
   const totalIncome = getTotalIncome(transactions);
   const totalExpenses = getTotalExpenses(transactions);
   const monthlySubscriptions = getMonthlySubscriptionCost(subscriptions);
-  const balance = totalIncome - totalExpenses - monthlySubscriptions;
+  const totalSavings = goals.reduce((s, g) => s + g.currentAmount, 0);
+  const balance = totalIncome - totalExpenses - monthlySubscriptions - totalSavings;
   const chartData = getLast6MonthsData(transactions);
 
   const expenseByCategory = EXPENSE_CATEGORIES.map((cat) => ({
@@ -99,6 +100,10 @@ export default function Dashboard() {
             <div className="flex justify-between text-zinc-400">
               <span className="flex items-center gap-1"><RefreshCw size={11} className="text-amber-400" /> Subscriptions</span>
               <span className="text-amber-400">−{format(monthlySubscriptions)}</span>
+            </div>
+            <div className="flex justify-between text-zinc-400">
+              <span className="flex items-center gap-1"><PiggyBank size={11} className="text-indigo-400" /> Savings</span>
+              <span className="text-indigo-400">−{format(totalSavings)}</span>
             </div>
           </div>
         </div>

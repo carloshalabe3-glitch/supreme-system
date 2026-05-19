@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { Transaction, TransactionType } from '@/lib/types';
 import { generateId, INCOME_CATEGORIES, EXPENSE_CATEGORIES } from '@/lib/utils';
 import { addTransaction } from '@/lib/storage';
+import { useCurrency, Currency } from '@/lib/currency';
 
 interface Props {
   onClose: () => void;
@@ -12,13 +13,20 @@ interface Props {
 }
 
 export default function TransactionModal({ onClose, onSave }: Props) {
+  const { rate, currency: globalCurrency } = useCurrency();
   const [type, setType] = useState<TransactionType>('expense');
   const [amount, setAmount] = useState('');
+  const [inputCurrency, setInputCurrency] = useState<Currency>(globalCurrency);
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
 
   const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+
+  // Preview of what will be stored in USD
+  const parsedAmount = parseFloat(amount) || 0;
+  const amountInUSD = inputCurrency === 'MXN' ? parsedAmount / rate : parsedAmount;
+  const amountInMXN = inputCurrency === 'USD' ? parsedAmount * rate : parsedAmount;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,7 +34,7 @@ export default function TransactionModal({ onClose, onSave }: Props) {
     const t: Transaction = {
       id: generateId(),
       type,
-      amount: parseFloat(amount),
+      amount: amountInUSD, // always stored as USD
       category: category as Transaction['category'],
       description,
       date,
@@ -68,16 +76,42 @@ export default function TransactionModal({ onClose, onSave }: Props) {
             ))}
           </div>
 
-          <input
-            type="number"
-            min="0.01"
-            step="0.01"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            required
-            className="bg-zinc-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-zinc-500"
-          />
+          {/* Amount + currency toggle */}
+          <div className="flex gap-2">
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              required
+              className="flex-1 bg-zinc-800 text-white rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-zinc-500"
+            />
+            <div className="flex rounded-lg overflow-hidden border border-zinc-700 shrink-0">
+              {(['USD', 'MXN'] as Currency[]).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setInputCurrency(c)}
+                  className={`px-3 py-2 text-xs font-bold transition-colors ${
+                    inputCurrency === c ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Conversion hint */}
+          {parsedAmount > 0 && (
+            <p className="text-zinc-500 text-xs -mt-2 px-1">
+              {inputCurrency === 'MXN'
+                ? `≈ $${amountInUSD.toFixed(2)} USD (÷ ${rate})`
+                : `≈ $${amountInMXN.toFixed(2)} MXN (× ${rate})`}
+            </p>
+          )}
 
           <select
             value={category}
