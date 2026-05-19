@@ -46,8 +46,8 @@ export default function Dashboard() {
 
   const totalIncome = getTotalIncome(transactions);
   const totalExpenses = getTotalExpenses(transactions);
-  const balance = totalIncome - totalExpenses;
   const monthlySubscriptions = getMonthlySubscriptionCost(subscriptions);
+  const balance = totalIncome - totalExpenses - monthlySubscriptions;
   const chartData = getLast6MonthsData(transactions);
 
   const expenseByCategory = EXPENSE_CATEGORIES.map((cat) => ({
@@ -75,15 +75,34 @@ export default function Dashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard
-          label="Balance"
-          value={format(balance)}
-          icon={<Wallet size={18} className="text-indigo-400" />}
-          color="bg-indigo-500/10"
-          trendUp={balance >= 0}
-          trend={balance >= 0 ? 'Positive balance' : 'Negative balance'}
-        />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+        {/* Balance breakdown card — spans 1 col on mobile, 1 on desktop */}
+        <div className="lg:col-span-1 bg-zinc-900 rounded-2xl p-5 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400 text-sm font-medium">Net Balance</span>
+            <span className="p-2 rounded-xl bg-indigo-500/10">
+              <Wallet size={18} className="text-indigo-400" />
+            </span>
+          </div>
+          <p className={`text-2xl font-bold ${balance >= 0 ? 'text-white' : 'text-rose-400'}`}>
+            {format(balance)}
+          </p>
+          <div className="border-t border-zinc-800 pt-3 flex flex-col gap-2 text-xs">
+            <div className="flex justify-between text-zinc-400">
+              <span className="flex items-center gap-1"><TrendingUp size={11} className="text-emerald-400" /> Income</span>
+              <span className="text-emerald-400">+{format(totalIncome)}</span>
+            </div>
+            <div className="flex justify-between text-zinc-400">
+              <span className="flex items-center gap-1"><TrendingDown size={11} className="text-rose-400" /> Expenses</span>
+              <span className="text-rose-400">−{format(totalExpenses)}</span>
+            </div>
+            <div className="flex justify-between text-zinc-400">
+              <span className="flex items-center gap-1"><RefreshCw size={11} className="text-amber-400" /> Subscriptions</span>
+              <span className="text-amber-400">−{format(monthlySubscriptions)}</span>
+            </div>
+          </div>
+        </div>
+
         <StatCard
           label="Total Income"
           value={format(totalIncome)}
