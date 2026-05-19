@@ -27,14 +27,14 @@ import {
 import { Transaction, Subscription, SavingsGoal } from '@/lib/types';
 import StatCard from '@/components/StatCard';
 import TransactionModal from '@/components/TransactionModal';
-import { useCurrency } from '@/lib/currency';
+import { useCurrency, Currency } from '@/lib/currency';
 
 export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [showModal, setShowModal] = useState(false);
-  const { format } = useCurrency();
+  const { format, currency, setCurrency } = useCurrency();
 
   function load() {
     setTransactions(getTransactions());
@@ -63,22 +63,37 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white">Dashboard</h1>
           <p className="text-zinc-400 text-sm mt-1">Your financial overview</p>
         </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          <Plus size={16} /> Add Transaction
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Currency toggle — visible on mobile (sidebar hidden) */}
+          <div className="flex md:hidden rounded-lg overflow-hidden border border-zinc-700">
+            {(['USD', 'MXN'] as Currency[]).map((c) => (
+              <button
+                key={c}
+                onClick={() => setCurrency(c)}
+                className={`px-3 py-1.5 text-xs font-bold transition-colors ${
+                  currency === c ? 'bg-indigo-600 text-white' : 'text-zinc-400'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Plus size={16} /> <span className="hidden sm:inline">Add Transaction</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-        {/* Balance breakdown card — spans 1 col on mobile, 1 on desktop */}
-        <div className="lg:col-span-1 bg-zinc-900 rounded-2xl p-5 flex flex-col gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div className="col-span-2 lg:col-span-1 bg-zinc-900 rounded-2xl p-5 flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <span className="text-zinc-400 text-sm font-medium">Net Balance</span>
             <span className="p-2 rounded-xl bg-indigo-500/10">
