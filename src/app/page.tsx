@@ -17,7 +17,6 @@ import {
 import { TrendingUp, TrendingDown, Wallet, RefreshCw, Plus } from 'lucide-react';
 import { getTransactions, getSubscriptions, getSavingsGoals } from '@/lib/storage';
 import {
-  formatCurrency,
   getTotalIncome,
   getTotalExpenses,
   getMonthlySubscriptionCost,
@@ -28,12 +27,14 @@ import {
 import { Transaction, Subscription, SavingsGoal } from '@/lib/types';
 import StatCard from '@/components/StatCard';
 import TransactionModal from '@/components/TransactionModal';
+import { useCurrency } from '@/lib/currency';
 
 export default function Dashboard() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const { format } = useCurrency();
 
   function load() {
     setTransactions(getTransactions());
@@ -77,7 +78,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard
           label="Balance"
-          value={formatCurrency(balance)}
+          value={format(balance)}
           icon={<Wallet size={18} className="text-indigo-400" />}
           color="bg-indigo-500/10"
           trendUp={balance >= 0}
@@ -85,19 +86,19 @@ export default function Dashboard() {
         />
         <StatCard
           label="Total Income"
-          value={formatCurrency(totalIncome)}
+          value={format(totalIncome)}
           icon={<TrendingUp size={18} className="text-emerald-400" />}
           color="bg-emerald-500/10"
         />
         <StatCard
           label="Total Expenses"
-          value={formatCurrency(totalExpenses)}
+          value={format(totalExpenses)}
           icon={<TrendingDown size={18} className="text-rose-400" />}
           color="bg-rose-500/10"
         />
         <StatCard
           label="Monthly Subs"
-          value={formatCurrency(monthlySubscriptions)}
+          value={format(monthlySubscriptions)}
           icon={<RefreshCw size={18} className="text-amber-400" />}
           color="bg-amber-500/10"
         />
@@ -125,7 +126,7 @@ export default function Dashboard() {
                 <Tooltip
                   contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: 8 }}
                   labelStyle={{ color: '#fff' }}
-                  formatter={(v) => formatCurrency(Number(v))}
+                  formatter={(v) => format(Number(v))}
                 />
                 <Area type="monotone" dataKey="income" stroke="#10b981" fill="url(#income)" strokeWidth={2} name="Income" />
                 <Area type="monotone" dataKey="expenses" stroke="#ef4444" fill="url(#expenses)" strokeWidth={2} name="Expenses" />
@@ -150,7 +151,7 @@ export default function Dashboard() {
                 </Pie>
                 <Tooltip
                   contentStyle={{ backgroundColor: '#18181b', border: 'none', borderRadius: 8 }}
-                  formatter={(v) => formatCurrency(Number(v))}
+                  formatter={(v) => format(Number(v))}
                 />
                 <Legend
                   iconType="circle"
@@ -181,7 +182,7 @@ export default function Dashboard() {
                     <p className="text-zinc-500 text-xs">{new Date(t.date).toLocaleDateString()}</p>
                   </div>
                   <span className={`font-semibold text-sm ${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                    {t.type === 'income' ? '+' : '-'}{format(t.amount)}
                   </span>
                 </li>
               ))}
@@ -202,7 +203,7 @@ export default function Dashboard() {
                     <div className="flex justify-between mb-1">
                       <span className="text-white text-sm font-medium">{g.name}</span>
                       <span className="text-zinc-400 text-xs">
-                        {formatCurrency(g.currentAmount)} / {formatCurrency(g.targetAmount)}
+                        {format(g.currentAmount)} / {format(g.targetAmount)}
                       </span>
                     </div>
                     <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import { SavingsGoal } from '@/lib/types';
 import { updateSavingsGoal } from '@/lib/storage';
-import { formatCurrency } from '@/lib/utils';
+import { useCurrency } from '@/lib/currency';
 
 interface Props {
   goal: SavingsGoal;
@@ -14,6 +14,7 @@ interface Props {
 
 export default function AddFundsModal({ goal, onClose, onSave }: Props) {
   const [amount, setAmount] = useState('');
+  const { format } = useCurrency();
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,7 +35,7 @@ export default function AddFundsModal({ goal, onClose, onSave }: Props) {
           </button>
         </div>
         <p className="text-zinc-400 text-sm mb-4">
-          {goal.name} &mdash; {formatCurrency(goal.currentAmount)} saved so far
+          {goal.name} &mdash; {format(goal.currentAmount)} saved so far
         </p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input

@@ -4,14 +4,16 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, PlusCircle } from 'lucide-react';
 import { getSavingsGoals, deleteSavingsGoal } from '@/lib/storage';
 import { SavingsGoal } from '@/lib/types';
-import { formatCurrency } from '@/lib/utils';
 import SavingsGoalModal from '@/components/SavingsGoalModal';
 import AddFundsModal from '@/components/AddFundsModal';
+import { useCurrency } from '@/lib/currency';
 
 export default function SavingsPage() {
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [addFundsGoal, setAddFundsGoal] = useState<SavingsGoal | null>(null);
+
+  const { format } = useCurrency();
 
   function load() {
     setGoals(getSavingsGoals());
@@ -57,8 +59,8 @@ export default function SavingsPage() {
             />
           </div>
           <div className="flex justify-between text-xs text-zinc-500">
-            <span>{formatCurrency(totalSaved)} saved</span>
-            <span>{formatCurrency(totalTarget)} target</span>
+            <span>{format(totalSaved)} saved</span>
+            <span>{format(totalTarget)} target</span>
           </div>
         </div>
       )}
@@ -95,8 +97,8 @@ export default function SavingsPage() {
                 {/* Progress */}
                 <div>
                   <div className="flex justify-between text-sm mb-2">
-                    <span className="text-white font-bold">{formatCurrency(g.currentAmount)}</span>
-                    <span className="text-zinc-500">of {formatCurrency(g.targetAmount)}</span>
+                    <span className="text-white font-bold">{format(g.currentAmount)}</span>
+                    <span className="text-zinc-500">of {format(g.targetAmount)}</span>
                   </div>
                   <div className="h-2.5 bg-zinc-800 rounded-full overflow-hidden">
                     <div
@@ -111,7 +113,7 @@ export default function SavingsPage() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div className="bg-zinc-800 rounded-xl px-3 py-2">
                     <p className="text-zinc-500 text-xs">Remaining</p>
-                    <p className="text-white font-medium">{formatCurrency(remaining > 0 ? remaining : 0)}</p>
+                    <p className="text-white font-medium">{format(remaining > 0 ? remaining : 0)}</p>
                   </div>
                   <div className="bg-zinc-800 rounded-xl px-3 py-2">
                     <p className="text-zinc-500 text-xs">Target date</p>

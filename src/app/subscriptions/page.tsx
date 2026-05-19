@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
 import { getSubscriptions, deleteSubscription, updateSubscription } from '@/lib/storage';
 import { Subscription } from '@/lib/types';
-import { formatCurrency, getMonthlySubscriptionCost, frequencyLabel } from '@/lib/utils';
+import { getMonthlySubscriptionCost, frequencyLabel } from '@/lib/utils';
 import SubscriptionModal from '@/components/SubscriptionModal';
+import { useCurrency } from '@/lib/currency';
 
 export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [showModal, setShowModal] = useState(false);
+
+  const { format } = useCurrency();
 
   function load() {
     setSubscriptions(getSubscriptions());
@@ -49,11 +52,11 @@ export default function SubscriptionsPage() {
       <div className="grid grid-cols-2 gap-4 mb-8">
         <div className="bg-zinc-900 rounded-xl p-4">
           <p className="text-zinc-400 text-xs mb-1">Monthly cost</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(monthlyTotal)}</p>
+          <p className="text-2xl font-bold text-white">{format(monthlyTotal)}</p>
         </div>
         <div className="bg-zinc-900 rounded-xl p-4">
           <p className="text-zinc-400 text-xs mb-1">Yearly cost</p>
-          <p className="text-2xl font-bold text-white">{formatCurrency(yearlyTotal)}</p>
+          <p className="text-2xl font-bold text-white">{format(yearlyTotal)}</p>
         </div>
       </div>
 
@@ -92,7 +95,7 @@ export default function SubscriptionsPage() {
               </div>
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-xl font-bold text-white">{formatCurrency(s.amount)}</p>
+                  <p className="text-xl font-bold text-white">{format(s.amount)}</p>
                   <p className="text-zinc-500 text-xs">{frequencyLabel(s.frequency)}</p>
                 </div>
                 <div className="text-right">
@@ -102,7 +105,7 @@ export default function SubscriptionsPage() {
               </div>
               <div className="text-right">
                 <span className="text-zinc-500 text-xs">
-                  ≈ {formatCurrency(
+                  ≈ {format(
                     s.frequency === 'monthly' ? s.amount :
                     s.frequency === 'yearly' ? s.amount / 12 :
                     s.amount * 4.33

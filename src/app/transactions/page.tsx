@@ -5,7 +5,6 @@ import { Plus, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import { getTransactions, deleteTransaction } from '@/lib/storage';
 import { Transaction } from '@/lib/types';
 import {
-  formatCurrency,
   getTotalIncome,
   getTotalExpenses,
   INCOME_CATEGORIES,
@@ -13,12 +12,14 @@ import {
   CATEGORY_COLORS,
 } from '@/lib/utils';
 import TransactionModal from '@/components/TransactionModal';
+import { useCurrency } from '@/lib/currency';
 
 const ALL_CATEGORIES = [...INCOME_CATEGORIES, ...EXPENSE_CATEGORIES];
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const { format } = useCurrency();
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState('');
   const [search, setSearch] = useState('');
@@ -67,7 +68,7 @@ export default function TransactionsPage() {
           </span>
           <div>
             <p className="text-zinc-400 text-xs">Total Income</p>
-            <p className="text-emerald-400 font-bold">{formatCurrency(income)}</p>
+            <p className="text-emerald-400 font-bold">{format(income)}</p>
           </div>
         </div>
         <div className="bg-zinc-900 rounded-xl p-4 flex items-center gap-3">
@@ -76,7 +77,7 @@ export default function TransactionsPage() {
           </span>
           <div>
             <p className="text-zinc-400 text-xs">Total Expenses</p>
-            <p className="text-rose-400 font-bold">{formatCurrency(expenses)}</p>
+            <p className="text-rose-400 font-bold">{format(expenses)}</p>
           </div>
         </div>
       </div>
@@ -151,7 +152,7 @@ export default function TransactionsPage() {
                       </span>
                     </td>
                     <td className={`px-5 py-3 text-right font-semibold text-sm ${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {t.type === 'income' ? '+' : '-'}{formatCurrency(t.amount)}
+                      {t.type === 'income' ? '+' : '-'}{format(t.amount)}
                     </td>
                     <td className="px-5 py-3 text-right">
                       <button
